@@ -33,8 +33,18 @@ export const useSocket = () => {
   useEffect(() => {
     if (!token) return;
 
-    // 1. Connect to the Java Endpoint
-    const socket = new SockJS('http://localhost:8080/ws');
+    // 🚨 ENVIRONMENT DETECTION LOGIC 🚨
+    // Checks if the window is currently loaded on your local machine or live on Vercel
+    const isLocalhost = typeof window !== 'undefined' && 
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    // Bypasses Vercel Environment UI entirely with clean fallback routing
+    const socketUrl = isLocalhost 
+      ? 'http://localhost:8080/ws' 
+      : 'https://nexus-community-backend-1.onrender.com/ws';
+
+    // 1. Connect to the Dynamic Java Endpoint
+    const socket = new SockJS(socketUrl);
     const client = Stomp.over(socket);
 
     // Disable debug logs to keep console clean
